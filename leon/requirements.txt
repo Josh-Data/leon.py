@@ -1,5 +1,5 @@
 causalimpact==0.2.6
-tensorflow==2.12.0
+tensorflow==2.16.1
 streamlit==1.29.0
 yfinance==0.2.36
 pandas==1.5.3
