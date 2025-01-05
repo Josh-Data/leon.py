@@ -75,14 +75,34 @@ price immediately after the election results when Trump was declared the winner.
 """)
 
 # Create sample data matching the exact format shown
-data = {
-    'y': [234.56, 236.78, 235.89, 238.90, 240.12]
-}
-index = pd.date_range(start='2023-11-13', periods=5, freq='D')
-df = pd.DataFrame(data, index=index)
-df.index = df.index.strftime('%Y-%m-%d 00:00:00')
 st.write("First five rows of Tesla stock data:")
-st.dataframe(df, hide_index=False)
+st.markdown("""
+<style>
+div[data-testid="stTable"] {
+    background-color: #1e1e1e;
+    color: white !important;
+}
+div[data-testid="stTable"] td, div[data-testid="stTable"] th {
+    color: white !important;
+    background-color: #1e1e1e !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+data = pd.DataFrame({
+    'y': [234.56, 236.78, 235.89, 238.9, 240.12]
+}, index=['2023-11-13 00:00:00', '2023-11-14 00:00:00', '2023-11-15 00:00:00', 
+          '2023-11-16 00:00:00', '2023-11-17 00:00:00'])
+
+st.dataframe(
+    data,
+    hide_index=False,
+    column_config={
+        "_index": "Date",
+        "y": "y"
+    },
+    use_container_width=True
+)
 
 st.write("""
 To truly understand the effect of the election on the stock prices, we need to compare Tesla's price 
@@ -96,29 +116,28 @@ st.code("""
 df = pd.concat([y,X],axis = 1).dropna()
 """, language="python")
 
-# Check for image in various locations
-possible_image_paths = [
-    'leon_plot.png',
-    './leon_plot.png',
-    '../leon_plot.png',
-    'static/leon_plot.png'
-]
+# Load and display the image
+st.write("Debug: Current working directory:", os.getcwd())
+image_path = 'leon_plot.png'
+st.write("Debug: Looking for image at:", os.path.abspath(image_path))
 
-image_found = False
-for img_path in possible_image_paths:
-    if os.path.exists(img_path):
-        try:
-            image = Image.open(img_path)
-            st.image(image, caption='Impact Analysis Plot')
-            image_found = True
-            break
-        except Exception as e:
-            continue
-
-if not image_found:
-    st.error("Error: leon_plot.png not found. Please ensure the image is properly uploaded.")
-    st.write("Current directory contents:")
-    st.code("\n".join(os.listdir()), language="text")
+try:
+    if os.path.exists(image_path):
+        st.write("Debug: Image file found")
+        image = Image.open(image_path)
+        st.image(image, caption='Impact Analysis Plot', use_column_width=True)
+    else:
+        st.error(f"Image file not found at {os.path.abspath(image_path)}")
+        
+        # List all files in current directory and parent directory
+        st.write("Debug: Files in current directory:")
+        st.code("\n".join(os.listdir('.')), language="text")
+        
+        st.write("Debug: Files in parent directory:")
+        st.code("\n".join(os.listdir('..')), language="text")
+except Exception as e:
+    st.error(f"Error loading image: {str(e)}")
+    st.write("Debug: Full error details:", e)
 
 st.write("We can see that there is a significant uptick in the Tesla share price.")
 
