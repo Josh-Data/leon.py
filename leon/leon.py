@@ -172,10 +172,10 @@ def load_image(image_name):
 # Display correlation plot
 image = load_image('corr.png')
 if image:
-    # Resize image to 50% of original size
-    width, height = image.size
-    resized_image = image.resize((width // 2, height // 2))
-    st.image(resized_image, caption='Correlation Plot', use_container_width=True)
+    # Create a column with half width
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.image(image, caption='Correlation Plot', use_container_width=True)
 else:
     st.error("""
         Image not found. Please ensure 'corr.png' exists in one of these locations:
@@ -188,11 +188,9 @@ st.write("""
 Now that we have removed Novartis and Exon Mobil for low correlation, we can run the CausalImpact model. 
 Here is the code:
 
-```python
 pre_period = [start,training_end]
 post_period = [treatment_start, treatment_end]
 impact = CausalImpact(data = df, post_period = post_period, pre_period= pre_period)
-```
 """)
 
 # Load and display the impact plot
