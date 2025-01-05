@@ -49,7 +49,7 @@ st.markdown("""
     background-color: white !important;
 }
 .stCodeBlock code {
-    color: #2c3e50 !important;
+    color: white !important;
 }
 
 /* Table styles */
@@ -172,7 +172,10 @@ def load_image(image_name):
 # Display correlation plot
 image = load_image('corr.png')
 if image:
-    st.image(image, caption='Correlation Plot', use_column_width=True)
+    # Resize image to 50% of original size
+    width, height = image.size
+    resized_image = image.resize((width // 2, height // 2))
+    st.image(resized_image, caption='Correlation Plot', use_container_width=True)
 else:
     st.error("""
         Image not found. Please ensure 'corr.png' exists in one of these locations:
@@ -195,7 +198,7 @@ impact = CausalImpact(data = df, post_period = post_period, pre_period= pre_peri
 # Load and display the impact plot
 image = load_image('plot.png')
 if image:
-    st.image(image, caption='Impact Analysis Plot', use_column_width=True)
+    st.image(image, caption='Impact Analysis Plot', use_container_width=True)
 else:
     st.error("""
         Image not found. Please ensure 'plot.png' exists in one of these locations:
