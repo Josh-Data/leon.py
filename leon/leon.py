@@ -132,12 +132,12 @@ st.write("""
 To truly understand the effect of the election on the stock prices, we need to compare Tesla's price 
 changes to a mixture of other stocks (both inside and outside of the automobile and technology sectors). 
 I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exxon Mobil, General Motors 
-and Starbucks. As Tesla is the target, I changed the name to "y"
+and Starbucks.
 """)
 
 # Display the combined dataframe
 df = pd.DataFrame({
-    'y': [223.710007, 237.410004, 242.839996, 233.589996, 234.300003],
+    'TSLA': [223.710007, 237.410004, 242.839996, 233.589996, 234.300003],
     'DIS': [88.348572, 89.958679, 92.783775, 93.356697, 93.001099],
     'GM': [26.547522, 27.830488, 27.771273, 27.119919, 27.662714],
     'META': [327.937317, 335.030212, 331.443909, 332.918274, 333.765045],
@@ -149,6 +149,22 @@ df = pd.DataFrame({
 }, index=pd.date_range(start='2023-11-13', periods=5))
 
 st.dataframe(df)
+
+# Display the differenced dataframe
+st.subheader("Differenced DataFrame")
+diff_df = pd.DataFrame({
+    'TSLA': [0.061240, 0.022872, -0.038091, 0.003040, 0.005548],
+    'DIS': [0.018224, 0.031404, 0.006175, -0.003809, 0.009347],
+    'GM': [0.048327, -0.002128, -0.023454, 0.020015, 0.017481],
+    'META': [0.021629, -0.010704, 0.004448, 0.002543, 0.014715],
+    'MSFT': [0.009790, 0.000406, 0.017583, -0.016801, 0.020522],
+    'NVS': [0.008715, -0.011695, 0.002772, 0.009037, 0.003582],
+    'SBUX': [0.020191, 0.004072, 0.011129, -0.015297, -0.012030],
+    'WMT': [-0.000179, 0.012705, -0.080928, -0.004422, -0.000322],
+    'XOM': [0.003850, -0.006041, -0.011576, 0.024400, -0.004383]
+}, index=pd.date_range(start='2023-11-14', periods=5))
+
+st.dataframe(diff_df)
 
 st.write("""
 We can use differencing to take away seasonality and to show to true correlations between the different stocks. 
@@ -212,7 +228,7 @@ else:
     if os.path.exists('static'):
         st.write("Files in static directory:", os.listdir('static'))
 
-st.write("We can see that there is a significant uptick in the Tesla share price. The model predicted a decrease in share price if not for the election(indicated by the hashed line), however the share price increased dramtically.")
+st.write("We can see that there is a significant uptick in the Tesla share price.")
 
 # Summary Report
 st.subheader("Summary Report")
