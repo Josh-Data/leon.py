@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 import pandas as pd
+import os
 
 # Page configuration
 st.set_page_config(
@@ -8,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS with fixed slider color
+# Custom CSS with fixed slider color and code block styling
 st.markdown("""
 <style>
 .stApp {
@@ -35,6 +36,13 @@ st.markdown("""
 .st-emotion-cache-1y4p8pa .stSlider > div > div > div > div {
     background-color: #4addbe !important;
 }
+/* Custom styling for code blocks */
+.stCodeBlock {
+    background-color: #1e1e1e !important;
+}
+code {
+    color: white !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -51,7 +59,7 @@ Donald Trump's most prominent supporters in the 2024 election. Let's see how the
 the stock price of Tesla, and therefore the personal wealth of Elon Musk himself.
 """)
 
-# Display the date parameters
+# Display the date parameters with proper styling
 st.code("""
 start = "2023-11-13"
 training_end = "2024-11-05"
@@ -66,13 +74,15 @@ ending the training data set on the day of the 2024 election. We then see the ef
 price immediately after the election results when Trump was declared the winner.
 """)
 
-# Load and display sample data
-# You would typically load this from a file, but for this example we'll create sample data
-sample_data = pd.DataFrame({
+# Create sample data matching the exact format shown
+data = {
     'y': [234.56, 236.78, 235.89, 238.90, 240.12]
-}, index=pd.date_range(start='2023-11-13', periods=5, freq='D'))
+}
+index = pd.date_range(start='2023-11-13', periods=5, freq='D')
+df = pd.DataFrame(data, index=index)
+df.index = df.index.strftime('%Y-%m-%d 00:00:00')
 st.write("First five rows of Tesla stock data:")
-st.dataframe(sample_data)
+st.dataframe(df, hide_index=False)
 
 st.write("""
 To truly understand the effect of the election on the stock prices, we need to compare Tesla's price 
@@ -81,24 +91,34 @@ I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exx
 and Starbucks.
 """)
 
-# Display sample combined data
+# Display the concatenation code with proper styling
 st.code("""
 df = pd.concat([y,X],axis = 1).dropna()
 """, language="python")
 
-# Load and display the correlation plot
-import os
+# Check for image in various locations
+possible_image_paths = [
+    'leon_plot.png',
+    './leon_plot.png',
+    '../leon_plot.png',
+    'static/leon_plot.png'
+]
 
-# Print current directory and files for debugging
-st.write("Current directory contents:")
-st.write(os.listdir())
+image_found = False
+for img_path in possible_image_paths:
+    if os.path.exists(img_path):
+        try:
+            image = Image.open(img_path)
+            st.image(image, caption='Impact Analysis Plot')
+            image_found = True
+            break
+        except Exception as e:
+            continue
 
-try:
-    image = Image.open('leon_plot.png')
-    st.image(image, caption='Impact Analysis Plot')
-except Exception as e:
-    st.error(f"Error loading image: {str(e)}")
-    st.write("Please ensure 'leon_plot.png' is in the correct directory.")
+if not image_found:
+    st.error("Error: leon_plot.png not found. Please ensure the image is properly uploaded.")
+    st.write("Current directory contents:")
+    st.code("\n".join(os.listdir()), language="text")
 
 st.write("We can see that there is a significant uptick in the Tesla share price.")
 
