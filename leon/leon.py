@@ -150,6 +150,13 @@ df = pd.DataFrame({
 
 st.dataframe(df)
 
+
+
+st.write("""
+We can use differencing to take away seasonality and to show to true correlations between the different stocks. 
+We can use the differenced data to run a correlation plot as seen below.
+""")
+
 # Display the differenced dataframe
 st.subheader("Differenced DataFrame")
 diff_df = pd.DataFrame({
@@ -165,11 +172,6 @@ diff_df = pd.DataFrame({
 }, index=pd.date_range(start='2023-11-14', periods=5))
 
 st.dataframe(diff_df)
-
-st.write("""
-We can use differencing to take away seasonality and to show to true correlations between the different stocks. 
-We can use the differenced data to run a correlation plot as seen below.
-""")
 
 # Image loading with proper error handling
 def load_image(image_name):
