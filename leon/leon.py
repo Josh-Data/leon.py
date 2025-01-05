@@ -58,7 +58,7 @@ training_end = "2024-11-05"
 treatment_start = "2024-11-06"
 treatment_end = "2024-11-08"
 end_stock = "2024-11-11"
-""")
+""", language="python")
 
 st.write("""
 We start monitoring the daily movement of Tesla stock prices about a year before the election, 
@@ -84,14 +84,21 @@ and Starbucks.
 # Display sample combined data
 st.code("""
 df = pd.concat([y,X],axis = 1).dropna()
-""")
+""", language="python")
 
 # Load and display the correlation plot
+import os
+
+# Print current directory and files for debugging
+st.write("Current directory contents:")
+st.write(os.listdir())
+
 try:
     image = Image.open('leon_plot.png')
     st.image(image, caption='Impact Analysis Plot')
-except:
-    st.write("Plot image not found. Please ensure 'leon_plot.png' is in the same directory.")
+except Exception as e:
+    st.error(f"Error loading image: {str(e)}")
+    st.write("Please ensure 'leon_plot.png' is in the correct directory.")
 
 st.write("We can see that there is a significant uptick in the Tesla share price.")
 
