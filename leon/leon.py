@@ -77,7 +77,7 @@ st.title("How the 2024 election made Elon Musk even richer")
 st.write("""
 Elon Musk, the worlds richest person derives most of his wealth from his stake in various companies. 
 He famously bought Twitter for 44 billion USD which is now valued at far less (between 15-20 billion USD). 
-Like Twitter, Space-X is also private, and not neither are traded on the NYSE.
+Like Twitter, Space-X is also private, and neither are traded on the NYSE.
 
 However, Tesla, the worlds largest car company by market cap is traded publicly. Elon Musk was one of 
 Donald Trump's most prominent supporters in the 2024 election. Let's see how the election results affected 
@@ -135,7 +135,7 @@ I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exx
 and Starbucks.
 """)
 
-# Simply display the combined dataframe
+# Display the combined dataframe
 df = pd.DataFrame({
     'TSLA': [234.56, 236.78, 235.89, 238.90, 240.12],
     'WMT': [152.34, 154.67, 153.89, 155.23, 156.78],
@@ -146,6 +146,11 @@ df = pd.DataFrame({
 }, index=pd.date_range(start='2023-11-13', periods=5))
 
 st.dataframe(df)
+
+st.write("""
+We can use differencing to take away seasonality and to show to true correlations between the different stocks. 
+We can use the differenced data to run a correlation plot as seen below.
+""")
 
 # Image loading with proper error handling
 def load_image(image_name):
@@ -164,7 +169,30 @@ def load_image(image_name):
             continue
     return None
 
-# Load and display the image
+# Display correlation plot
+image = load_image('corr.png')
+if image:
+    st.image(image, caption='Correlation Plot', use_column_width=True)
+else:
+    st.error("""
+        Image not found. Please ensure 'corr.png' exists in one of these locations:
+        - Current directory
+        - 'static' folder
+        - Same directory as this script
+    """)
+
+st.write("""
+Now that we have removed Novartis and Exon Mobil for low correlation, we can run the CausalImpact model. 
+Here is the code:
+
+```python
+pre_period = [start,training_end]
+post_period = [treatment_start, treatment_end]
+impact = CausalImpact(data = df, post_period = post_period, pre_period= pre_period)
+```
+""")
+
+# Load and display the impact plot
 image = load_image('plot.png')
 if image:
     st.image(image, caption='Impact Analysis Plot', use_column_width=True)
@@ -191,8 +219,8 @@ meaningfully interpreted), the response variable had an overall value of 906.66.
 By contrast, had the intervention not taken place, we would have expected a sum of 687.22. 
 The 95% interval of this prediction is [619.92, 749.25].
 
-The above results are given in terms of absolute numbers. In relative terms, the response variable 
-showed an increase of +31.93%. The 95% interval of this percentage is [22.91%, 41.72%].
+The above results are given in terms of absolute numbers. **In relative terms, the response variable 
+showed an increase of +31.93%. The 95% interval of this percentage is [22.91%, 41.72%].**
 
 The probability of obtaining this effect by chance is very small (Bayesian one-sided tail-area 
 probability p = 0.0). This means the causal effect can be considered statistically significant.
