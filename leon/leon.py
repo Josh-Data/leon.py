@@ -132,12 +132,12 @@ st.write("""
 To truly understand the effect of the election on the stock prices, we need to compare Tesla's price 
 changes to a mixture of other stocks (both inside and outside of the automobile and technology sectors). 
 I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exxon Mobil, General Motors 
-and Starbucks.
+and Starbucks. As Tesla is the target, I changed the name to "y"
 """)
 
 # Display the combined dataframe
 df = pd.DataFrame({
-    'TSLA': [223.710007, 237.410004, 242.839996, 233.589996, 234.300003],
+    'y': [223.710007, 237.410004, 242.839996, 233.589996, 234.300003],
     'DIS': [88.348572, 89.958679, 92.783775, 93.356697, 93.001099],
     'GM': [26.547522, 27.830488, 27.771273, 27.119919, 27.662714],
     'META': [327.937317, 335.030212, 331.443909, 332.918274, 333.765045],
@@ -212,7 +212,7 @@ else:
     if os.path.exists('static'):
         st.write("Files in static directory:", os.listdir('static'))
 
-st.write("We can see that there is a significant uptick in the Tesla share price.")
+st.write("We can see that there is a significant uptick in the Tesla share price. The model predicted a decrease in share price if not for the election(indicated by the hashed line), however the share price increased dramtically.")
 
 # Summary Report
 st.subheader("Summary Report")
