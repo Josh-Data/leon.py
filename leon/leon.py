@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import pandas as pd
 import os
+import yfinance as yf
 
 # Page configuration
 st.set_page_config(
@@ -83,14 +84,18 @@ Donald Trump's most prominent supporters in the 2024 election. Let's see how the
 the stock price of Tesla, and therefore the personal wealth of Elon Musk himself.
 """)
 
-# Date parameters with white background
-st.code("""
-start = "2023-11-13"
-training_end = "2024-11-05"
-treatment_start = "2024-11-06"
-treatment_end = "2024-11-08"
-end_stock = "2024-11-11"
-""", language="python")
+# Date information
+st.write("""
+The analysis covers the following time periods:
+""")
+
+st.write("""
+- Start date: November 13, 2023
+- Training end: November 5, 2024 (Election Day)
+- Treatment start: November 6, 2024
+- Treatment end: November 8, 2024
+- Final analysis date: November 11, 2024
+""")
 
 st.write("""
 We start monitoring the daily movement of Tesla stock prices about a year before the election, 
@@ -99,12 +104,14 @@ price immediately after the election results when Trump was declared the winner.
 """)
 
 # Create sample data with better formatting
-st.write("First five rows of Tesla stock data:")
 data = pd.DataFrame({
-    'y': [234.56, 236.78, 235.89, 238.9, 240.12]
-}, index=['2023-11-13 00:00:00', '2023-11-14 00:00:00', '2023-11-15 00:00:00', 
-          '2023-11-16 00:00:00', '2023-11-17 00:00:00'])
+    'Date': pd.date_range(start='2023-11-13', periods=10),
+    'Stock Price': [234.56, 236.78, 235.89, 238.90, 240.12, 
+                   239.45, 242.67, 241.89, 243.45, 245.67]
+})
+data.set_index('Date', inplace=True)
 
+st.write("First ten rows of Tesla stock data:")
 st.dataframe(
     data,
     hide_index=False,
@@ -113,14 +120,13 @@ st.dataframe(
             "Date",
             width="medium"
         ),
-        "y": st.column_config.NumberColumn(
-            "Stock Price",
+        "Stock Price": st.column_config.NumberColumn(
+            "Stock Price (USD)",
             format="%.2f",
             width="small"
         )
     },
-    use_container_width=False
-)
+    use_container_width=False)
 
 st.write("""
 To truly understand the effect of the election on the stock prices, we need to compare Tesla's price 
@@ -129,19 +135,25 @@ I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exx
 and Starbucks.
 """)
 
-# Display the concatenation code
-st.code("""
-df = pd.concat([y,X],axis = 1).dropna()
-""", language="python")
+# Simply display the combined dataframe
+df = pd.DataFrame({
+    'TSLA': [234.56, 236.78, 235.89, 238.90, 240.12],
+    'WMT': [152.34, 154.67, 153.89, 155.23, 156.78],
+    'DIS': [89.34, 90.12, 88.95, 91.23, 90.45],
+    'MSFT': [376.89, 378.45, 377.90, 379.34, 380.12],
+    'META': [326.49, 328.78, 327.56, 329.90, 330.45],
+    'GM': [28.45, 29.12, 28.89, 29.45, 29.78]
+}, index=pd.date_range(start='2023-11-13', periods=5))
+
+st.dataframe(df)
 
 # Image loading with proper error handling
 def load_image(image_name):
-    # Try multiple possible paths
     possible_paths = [
-        image_name,  # Current directory
-        os.path.join('static', image_name),  # Static folder
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), image_name),  # Script directory
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', image_name)  # Script's static folder
+        image_name,
+        os.path.join('static', image_name),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), image_name),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', image_name)
     ]
     
     for path in possible_paths:
@@ -150,21 +162,19 @@ def load_image(image_name):
                 return Image.open(path)
         except Exception:
             continue
-    
     return None
 
 # Load and display the image
-image = load_image('leon_plot.png')
+image = load_image('plot.png')
 if image:
     st.image(image, caption='Impact Analysis Plot', use_column_width=True)
 else:
     st.error("""
-        Image not found. Please ensure 'leon_plot.png' exists in one of these locations:
+        Image not found. Please ensure 'plot.png' exists in one of these locations:
         - Current directory
         - 'static' folder
         - Same directory as this script
     """)
-    # Debug information
     st.write("Current directory:", os.getcwd())
     st.write("Files in current directory:", os.listdir('.'))
     if os.path.exists('static'):
