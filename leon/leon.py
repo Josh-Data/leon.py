@@ -9,24 +9,30 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS with fixed slider color and code block styling
+# Custom CSS with all styling in one place
 st.markdown("""
 <style>
+/* Global styles */
 .stApp {
     background-color: white;
 }
 .css-1d391kg {
     background-color: white;
 }
+
+/* Button styles */
 .stButton>button {
     background-color: #4addbe;
     color: white;
     border: 1px solid #2c3e50 !important;
 }
+
+/* Text styles */
 .stMarkdown, h1, h2, h3, p, span, label {
     color: #2c3e50 !important;
 }
-/* Style for slider - new streamlit class names */
+
+/* Slider styles */
 .st-emotion-cache-1y4p8pa {
     width: 100%;
 }
@@ -36,12 +42,30 @@ st.markdown("""
 .st-emotion-cache-1y4p8pa .stSlider > div > div > div > div {
     background-color: #4addbe !important;
 }
-/* Custom styling for code blocks */
+
+/* Code block styles */
 .stCodeBlock {
-    background-color: #1e1e1e !important;
+    background-color: white !important;
 }
-code {
-    color: white !important;
+.stCodeBlock code {
+    color: #2c3e50 !important;
+}
+
+/* Table styles */
+div[data-testid="stDataFrame"] {
+    width: 100% !important;
+    max-width: 800px !important;
+}
+div[data-testid="stDataFrame"] > div {
+    max-width: none !important;
+}
+div[data-testid="stTable"] {
+    color: #2c3e50 !important;
+}
+div[data-testid="stTable"] td, div[data-testid="stTable"] th {
+    color: #2c3e50 !important;
+    text-align: left;
+    padding: 8px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -59,7 +83,7 @@ Donald Trump's most prominent supporters in the 2024 election. Let's see how the
 the stock price of Tesla, and therefore the personal wealth of Elon Musk himself.
 """)
 
-# Display the date parameters with proper styling
+# Date parameters with white background
 st.code("""
 start = "2023-11-13"
 training_end = "2024-11-05"
@@ -74,21 +98,8 @@ ending the training data set on the day of the 2024 election. We then see the ef
 price immediately after the election results when Trump was declared the winner.
 """)
 
-# Create sample data matching the exact format shown
+# Create sample data with better formatting
 st.write("First five rows of Tesla stock data:")
-st.markdown("""
-<style>
-div[data-testid="stTable"] {
-    background-color: #1e1e1e;
-    color: white !important;
-}
-div[data-testid="stTable"] td, div[data-testid="stTable"] th {
-    color: white !important;
-    background-color: #1e1e1e !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 data = pd.DataFrame({
     'y': [234.56, 236.78, 235.89, 238.9, 240.12]
 }, index=['2023-11-13 00:00:00', '2023-11-14 00:00:00', '2023-11-15 00:00:00', 
@@ -98,10 +109,17 @@ st.dataframe(
     data,
     hide_index=False,
     column_config={
-        "_index": "Date",
-        "y": "y"
+        "_index": st.column_config.Column(
+            "Date",
+            width="medium"
+        ),
+        "y": st.column_config.NumberColumn(
+            "Stock Price",
+            format="%.2f",
+            width="small"
+        )
     },
-    use_container_width=True
+    use_container_width=False
 )
 
 st.write("""
@@ -111,37 +129,50 @@ I chose the following companies: Walmart, Disney, Novartis, Microsoft, Meta, Exx
 and Starbucks.
 """)
 
-# Display the concatenation code with proper styling
+# Display the concatenation code
 st.code("""
 df = pd.concat([y,X],axis = 1).dropna()
 """, language="python")
 
-# Load and display the image
-st.write("Debug: Current working directory:", os.getcwd())
-image_path = 'leon_plot.png'
-st.write("Debug: Looking for image at:", os.path.abspath(image_path))
+# Image loading with proper error handling
+def load_image(image_name):
+    # Try multiple possible paths
+    possible_paths = [
+        image_name,  # Current directory
+        os.path.join('static', image_name),  # Static folder
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), image_name),  # Script directory
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', image_name)  # Script's static folder
+    ]
+    
+    for path in possible_paths:
+        try:
+            if os.path.exists(path):
+                return Image.open(path)
+        except Exception:
+            continue
+    
+    return None
 
-try:
-    if os.path.exists(image_path):
-        st.write("Debug: Image file found")
-        image = Image.open(image_path)
-        st.image(image, caption='Impact Analysis Plot', use_column_width=True)
-    else:
-        st.error(f"Image file not found at {os.path.abspath(image_path)}")
-        
-        # List all files in current directory and parent directory
-        st.write("Debug: Files in current directory:")
-        st.code("\n".join(os.listdir('.')), language="text")
-        
-        st.write("Debug: Files in parent directory:")
-        st.code("\n".join(os.listdir('..')), language="text")
-except Exception as e:
-    st.error(f"Error loading image: {str(e)}")
-    st.write("Debug: Full error details:", e)
+# Load and display the image
+image = load_image('leon_plot.png')
+if image:
+    st.image(image, caption='Impact Analysis Plot', use_column_width=True)
+else:
+    st.error("""
+        Image not found. Please ensure 'leon_plot.png' exists in one of these locations:
+        - Current directory
+        - 'static' folder
+        - Same directory as this script
+    """)
+    # Debug information
+    st.write("Current directory:", os.getcwd())
+    st.write("Files in current directory:", os.listdir('.'))
+    if os.path.exists('static'):
+        st.write("Files in static directory:", os.listdir('static'))
 
 st.write("We can see that there is a significant uptick in the Tesla share price.")
 
-# Display the summary statistics
+# Summary Report
 st.subheader("Summary Report")
 st.write("""
 Summing up the individual data points during the post-intervention period (which can only sometimes be 
